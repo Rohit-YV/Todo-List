@@ -7,10 +7,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-let items = []; 
+let items = [];
+let workitems = [];
+
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static("public")); 
+app.use(express.static('public'));
 
 app.get("/", (req, res) => {
     const today = new Date();
@@ -22,17 +24,26 @@ app.get("/", (req, res) => {
     const day = today.toLocaleDateString("en-US", options);
 
     res.render("list", {
-        kindofday: day,
-        newlistitems: items 
+        listTitle: day,
+        newlistitems: items
     });
 });
 
 app.post("/", (req, res) => {
     const item = req.body.newItem;
-    items.push(item);
-    res.redirect("/");
+    if (req.body.list === "Work List") {
+        workitems.push(item);
+        res.redirect("/work");
+    } else {
+        items.push(item);
+        res.redirect("/");
+    }
 });
 
-app.listen(3000, () => {
-    console.log("Server is listening on port 3000");
+app.get("/work", (req, res) => {
+    res.render("list", { listTitle: "Work List", newlistitems: workitems });
+});
+
+app.listen(5000, () => {
+    console.log("Server is listening on port 5000");
 });
